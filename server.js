@@ -2,9 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool, initDb } = require('./db'); // Importera både pool och initDb
+const cors = require('cors');
 
 const app = express();
 
+app.use(cors()); 
 app.use(express.json()); // Middleware för att tolka JSON
 
 initDb(); // Initiera databasen
