@@ -15,7 +15,10 @@ POST /register
 Content-Type: application/json
 
 {
-  "username": "nyanvandare",
+  "firstname": "Nyanländ",
+  "lastname": "Vandrare",
+  "email": "nyanlandvandare@gmail.com",
+  "username": "nyanladvandare",
   "password": "säkertlösenord"
 }
 

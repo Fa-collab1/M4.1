@@ -21,7 +21,7 @@ app.post('/register', async (req, res) => {
   const { username, password, firstname, lastname, email } = req.body;
   // kontrollerar att alla fält är ifyllda
   if (!username || !password || !firstname || !lastname || !email) {
-    return res.status(400).json({ error: "Username, password, firstname, lastname, and email are all required fields" });
+    return res.status(400).json({ error: "All fields (username, password, firstname, lastname, and email) are required." });
   }
 
   // Validerar emailadressen mha regex
@@ -29,19 +29,20 @@ app.post('/register', async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+
   if (!isValidEmail(email)) {
-    return res.status(400).json({ error: "Invalid email address format" });
+    return res.status(400).json({ error: "Invalid email address format." });
   }
 
   // Kontrollera om användarnamnet redan är upptaget
   const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
   if (userExists.rows.length > 0) {
-    return res.status(400).json({ error: "Username already exists" });
+    return res.status(400).json({ error: "Username already exists." });
   }
 
   // Lösenord ska vara minst 6 tecken långt
   if (password.length < 6) {
-    return res.status(400).json({ error: "Password must be at least 6 characters long" });
+    return res.status(400).json({ error: "Password must be at least 6 characters long." });
   }
 
   // Om alla kontroller är ok, försök skapa en användare (och logga in den om möjligt)
@@ -61,23 +62,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
-try {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const result = await pool.query(
-    'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
-    [username, hashedPassword]
-  );
-  try {
-    const token = jwt.sign({ id: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (err) {
-    res.status(201).json(result.rows[0]);
-  }
-} catch (error) {
-  console.error("Error while registering user:", error);
-  res.status(500).json({ error: error.message });
-}
 
 // Endpoint för att logga in användare och generera JWT:
 app.post('/login', async (req, res) => {
