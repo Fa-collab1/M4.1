@@ -86,8 +86,8 @@ app.get('/protected', authenticateToken, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT id, companyname, jobtitle, startdate, enddate, description FROM workexperience');
     res.json(rows);
-  } catch (error) {
-    console.error("Error fetching work experience data:", error);
-    res.status(500).json({ error: "An error occurred while fetching work experience data" });
-  }
+  }catch (error) {
+    console.error("Error fetching work experience data:", error.message);
+    res.status(500).json({ error: "An error occurred while fetching work experience data", details: error.message });
+}
 });
