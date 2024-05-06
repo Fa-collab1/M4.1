@@ -18,7 +18,7 @@ app.listen(PORT, () => {
 
 // Endpoint för att registrera nya användare:
 app.post('/register', async (req, res) => {
-  const { username, password, firstname, lastname, email } = req.body;
+  const { firstname, lastname, email, username, password } = req.body;
   // kontrollerar att alla fält är ifyllda
   if (!username || !password || !firstname || !lastname || !email) {
     return res.status(400).json({ error: "All fields (username, password, firstname, lastname, and email) are required." });
@@ -49,8 +49,8 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      'INSERT INTO users (username, password, firstname, lastname, email) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [username, hashedPassword, firstname, lastname, email]
+      'INSERT INTO users (firstname, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [firstname, lastname, email, username, hashedPassword]
     );
       // Updaterar senaste logintid för användaren
     await pool.query('UPDATE users SET latest_login = CURRENT_TIMESTAMP WHERE id = $1', [rows[0].id]);
