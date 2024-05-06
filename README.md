@@ -1,4 +1,4 @@
-# Lösenordsserver
+# Lösenordsserver med skyddat data
 
 ## Beskrivning
 
