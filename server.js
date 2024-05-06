@@ -19,49 +19,31 @@ app.listen(PORT, () => {
 // Endpoint för att registrera nya användare:
 app.post('/register', async (req, res) => {
   const { firstname, lastname, email, username, password } = req.body;
-  // kontrollerar att alla fält är ifyllda
-  if (!username || !password || !firstname || !lastname || !email) {
-    return res.status(400).json({ error: "All fields (username, password, firstname, lastname, and email) are required." });
-  }
-
-  // Validerar emailadressen mha regex
-  function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ error: "Invalid email address format." });
-  }
-
-  // Kontrollera om användarnamnet redan är upptaget
-  const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-  if (userExists.rows.length > 0) {
-    return res.status(400).json({ error: "Username already exists." });
-  }
-
-  // Lösenord ska vara minst 6 tecken långt
-  if (password.length < 6) {
-    return res.status(400).json({ error: "Password must be at least 6 characters long." });
-  }
-
-  // Om alla kontroller är ok, försök skapa en användare (och logga in den om möjligt)
   try {
+    // Hasha lösenordet
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Lägg till en ny användare i databasen
     const result = await pool.query(
-      'INSERT INTO users (firstname, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO users (firstname, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5) RETURNING id',
       [firstname, lastname, email, username, hashedPassword]
     );
-      // Updaterar senaste logintid för användaren
-    await pool.query('UPDATE users SET latest_login = CURRENT_TIMESTAMP WHERE id = $1', [rows[0].id]);
-    const token = jwt.sign({ id: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+
+    if (result.rows.length > 0) {
+      // Uppdatera den senaste inloggningstiden för den nya användaren
+      await pool.query('UPDATE users SET latest_login = CURRENT_TIMESTAMP WHERE id = $1', [result.rows[0].id]);
+
+      // Generera JWT-token för autentisering
+      const token = jwt.sign({ id: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      res.json({ token });
+    } else {
+      res.status(500).json({ error: "Error registering user. Please try again." });
+    }
   } catch (error) {
     console.error("Error while registering user:", error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 // Endpoint för att logga in användare och generera JWT:
 app.post('/login', async (req, res) => {
