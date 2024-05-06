@@ -84,7 +84,7 @@ function authenticateToken(req, res, next) {
 // Endpoint som nyttjar JWT middleware för att skydda åtkomsten:
 app.get('/protected', authenticateToken, async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT id, companyname, jobtitle, startdate, enddate, description FROM workexperience');
+    const { rows } = await pool.query('SELECT id, companyname, jobtitle, location, startdate, enddate, description FROM workexperience');
     res.json(rows);
   }catch (error) {
     console.error("Error fetching work experience data:", error.message);
