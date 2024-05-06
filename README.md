@@ -46,7 +46,7 @@ Content-Type: application/json
 
 ### Åtkomst till skyddade resurser
 
-För att åtkomst till skyddade resurser, skicka en GET-förfrågan till `/protected`, och inkludera den JWT-token som erhållits från inloggningen.
+För att få åtkomst till skyddade resurser, skicka en GET-förfrågan till `/protected`, och inkludera den JWT-token som erhållits från inloggningen.
 
 **Exempel på förfrågan:**
 GET /protected
