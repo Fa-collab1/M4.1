@@ -3,6 +3,7 @@
 ## Beskrivning
 
 Denna server hanterar användarautentisering och sessioner för en webbapplikation. Den tillhandahåller endpoints för registrering, inloggning och åtkomst till skyddade resurser.
+Servern är publicerad på [Heroku](https://joni2307passwordapplication-88a3e4203a75.herokuapp.com/) och all kod (förutom env.variablerna) är uppladdade på [GitHub](https://github.com/Fa-collab1/M4.1).
 
 ## Hur man använder servern
 
